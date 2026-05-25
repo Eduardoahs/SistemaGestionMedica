@@ -1,0 +1,14 @@
+C:\Users\xaria\source\repos\parteClinica\parteClinica\bin\Debug\net10.0\parteClinica.exe
+C:\Users\xaria\source\repos\parteClinica\parteClinica\bin\Debug\net10.0\parteClinica.deps.json
+C:\Users\xaria\source\repos\parteClinica\parteClinica\bin\Debug\net10.0\parteClinica.runtimeconfig.json
+C:\Users\xaria\source\repos\parteClinica\parteClinica\bin\Debug\net10.0\parteClinica.dll
+C:\Users\xaria\source\repos\parteClinica\parteClinica\bin\Debug\net10.0\parteClinica.pdb
+C:\Users\xaria\source\repos\parteClinica\parteClinica\obj\Debug\net10.0\parteClinica.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\xaria\source\repos\parteClinica\parteClinica\obj\Debug\net10.0\parteClinica.AssemblyInfoInputs.cache
+C:\Users\xaria\source\repos\parteClinica\parteClinica\obj\Debug\net10.0\parteClinica.AssemblyInfo.cs
+C:\Users\xaria\source\repos\parteClinica\parteClinica\obj\Debug\net10.0\parteClinica.csproj.CoreCompileInputs.cache
+C:\Users\xaria\source\repos\parteClinica\parteClinica\obj\Debug\net10.0\parteClinica.dll
+C:\Users\xaria\source\repos\parteClinica\parteClinica\obj\Debug\net10.0\refint\parteClinica.dll
+C:\Users\xaria\source\repos\parteClinica\parteClinica\obj\Debug\net10.0\parteClinica.pdb
+C:\Users\xaria\source\repos\parteClinica\parteClinica\obj\Debug\net10.0\parteClinica.genruntimeconfig.cache
+C:\Users\xaria\source\repos\parteClinica\parteClinica\obj\Debug\net10.0\ref\parteClinica.dll
