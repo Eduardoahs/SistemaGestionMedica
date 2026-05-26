@@ -11,7 +11,10 @@ namespace SistemaGestionMedica
         public string Telefono { get; private set; }
         public List<Cita> HistorialCitas { get; private set; }
 
-        public string edad = string.Parse(Edad);
+        public string ObtenerEdad()
+        {
+            return Edad.ToString();
+        }
 
         public Paciente(string cedula, string nombreCompleto, int edad, string telefono)
         {
