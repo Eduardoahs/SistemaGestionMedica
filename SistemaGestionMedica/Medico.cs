@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SistemaGestionMedica
 {
     public class Medico
     {
-
         public string CodigoMedico { get; private set; }
         public string NombreCompleto { get; private set; }
         public string Especialidad { get; private set; }
@@ -14,11 +14,38 @@ namespace SistemaGestionMedica
 
         public Medico(string codigoMedico, string nombreCompleto, string especialidad)
         {
-            CodigoMedico       = codigoMedico;
-            NombreCompleto     = nombreCompleto;
-            Especialidad       = especialidad;
-            Disponible         = true;             
-            PacientesAtendidos = new List<Paciente>(); 
+            string codigoLimpio = codigoMedico?.Trim() ?? "";
+            if (string.IsNullOrWhiteSpace(codigoLimpio))
+            {
+                CodigoMedico = "MED-00";
+            }
+            else
+            {
+                CodigoMedico = codigoLimpio;
+            }
+
+            string nombreLimpio = nombreCompleto?.Trim() ?? "";
+            if (string.IsNullOrWhiteSpace(nombreLimpio) || nombreLimpio.Any(char.IsDigit))
+            {
+                NombreCompleto = "Medico Sin Nombre";
+            }
+            else
+            {
+                NombreCompleto = nombreLimpio;
+            }
+
+            string espLimpia = especialidad?.Trim() ?? "";
+            if (string.IsNullOrWhiteSpace(espLimpia) || espLimpia.Any(char.IsDigit))
+            {
+                Especialidad = "General";
+            }
+            else
+            {
+                Especialidad = espLimpia;
+            }
+
+            Disponible = true;
+            PacientesAtendidos = new List<Paciente>();
         }
 
         public void MostrarInformacion()
@@ -34,7 +61,6 @@ namespace SistemaGestionMedica
             Console.WriteLine("========================================");
         }
 
-
         public void MostrarPacientesAtendidos()
         {
             Console.WriteLine($"\n--- Pacientes atendidos por {NombreCompleto} ---");
@@ -47,7 +73,7 @@ namespace SistemaGestionMedica
 
             foreach (Paciente paciente in PacientesAtendidos)
             {
-                paciente.MostrarInformacion();
+                paciente.MostrarInformation();
             }
         }
     }

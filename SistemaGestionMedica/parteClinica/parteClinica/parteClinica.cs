@@ -15,9 +15,9 @@ namespace SistemaGestionMedica
         public static void CargarDatosIniciales()
         {
             // 1. PACIENTES
-            pacientesLista.Add(new Paciente("V-12345678", "Carlos Pérez", 20, "0412-1234567"));
-            pacientesLista.Add(new Paciente("V-87654321", "María Rodríguez", 35, "0414-7654321"));
-            pacientesLista.Add(new Paciente("V-11223344", "Juan Gómez", 50, "0426-1112233"));
+            pacientesLista.Add(new Paciente("V-12345678", "Carlos Pérez", "20", "0412-1234567"));
+            pacientesLista.Add(new Paciente("V-87654321", "María Rodríguez", "35", "0414-7654321"));
+            pacientesLista.Add(new Paciente("V-11223344", "Juan Gómez", "50", "0426-1112233"));
 
             // 2. MÉDICOS
             medicosLista.Add(new Medico("MED-01", "Dr. Alejandro Flores", "Cardiología"));
@@ -34,36 +34,86 @@ namespace SistemaGestionMedica
             Console.WriteLine("          REGISTRAR PACIENTE            ");
             Console.WriteLine("========================================");
 
-            Console.Write("Ingrese Cédula del Paciente (Ej: V-12345678): ");
-            string cedula = Console.ReadLine();
-
-            if (pacientesLista.Any(p => p.Cedula == cedula))
+            // 1. VALIDACIÓN DE CÉDULA
+            string cedula = "";
+            while (true)
             {
-                Console.WriteLine("\n[!] Error: Ya existe un paciente registrado con esa cédula.");
-                Console.WriteLine("\nPresione cualquier tecla para volver...");
-                Console.ReadKey();
-                return;
+                Console.Write("Ingrese Cédula del Paciente (Ej: V-12345678): ");
+                cedula = Console.ReadLine().Trim();
+
+                if (string.IsNullOrWhiteSpace(cedula) || cedula.Length < 5)
+                {
+                    Console.WriteLine("[!] Error: La cédula no es válida o es muy corta.");
+                    continue;
+                }
+
+                if (pacientesLista.Any(p => p.Cedula == cedula))
+                {
+                    Console.WriteLine("\n[!] Error: Ya existe un paciente registrado con esa cédula.");
+                    Console.WriteLine("\nPresione cualquier tecla para volver...");
+                    Console.ReadKey();
+                    return;
+                }
+                break;
             }
 
-            Console.Write("Ingrese Nombre Completo: ");
-            string nombreCompleto = Console.ReadLine();
-
-            Console.Write("Ingrese Edad: ");
-            string edadStr = Console.ReadLine();
-
-            Console.Write("Ingrese Teléfono: ");
-            string telefono = Console.ReadLine();
-
-            try
+            // 2. VALIDACIÓN DE NOMBRE (No permite números ni vacíos)
+            string nombreCompleto = "";
+            while (true)
             {
-                int edadAnios = int.Parse(edadStr);
-                pacientesLista.Add(new Paciente(cedula, nombreCompleto, edadAnios, telefono));
-                Console.WriteLine("\n[+] Paciente registrado con éxito.");
+                Console.Write("Ingrese Nombre Completo: ");
+                nombreCompleto = Console.ReadLine().Trim();
+
+                if (string.IsNullOrWhiteSpace(nombreCompleto))
+                {
+                    Console.WriteLine("[!] Error: El nombre no puede estar vacío.");
+                    continue;
+                }
+                if (nombreCompleto.Any(char.IsDigit))
+                {
+                    Console.WriteLine("[!] Error: El nombre no puede contener números.");
+                    continue;
+                }
+                break;
             }
-            catch (FormatException)
+
+            // 3. VALIDACIÓN DE EDAD (No permite letras, ni vacíos, ni números gigantes que rompan)
+            string edadStr = "";
+            while (true)
             {
-                Console.WriteLine("\n[!] Error: La edad debe ser un número entero válido.");
+                Console.Write("Ingrese Edad (0 - 120): ");
+                edadStr = Console.ReadLine().Trim();
+
+                if (!long.TryParse(edadStr, out long edadGrande) || edadGrande < 0 || edadGrande > 120)
+                {
+                    Console.WriteLine("[!] Error: Ingrese una edad numérica válida entre 0 y 120.");
+                    continue;
+                }
+                break;
             }
+
+            // 4. VALIDACIÓN DE TELÉFONO (No permite letras)
+            string telefono = "";
+            while (true)
+            {
+                Console.Write("Ingrese Teléfono: ");
+                telefono = Console.ReadLine().Trim();
+
+                if (string.IsNullOrWhiteSpace(telefono))
+                {
+                    Console.WriteLine("[!] Error: El teléfono no puede estar vacío.");
+                    continue;
+                }
+                if (telefono.Any(char.IsLetter))
+                {
+                    Console.WriteLine("[!] Error: El teléfono no puede contener letras.");
+                    continue;
+                }
+                break;
+            }
+
+            pacientesLista.Add(new Paciente(cedula, nombreCompleto, edadStr, telefono));
+            Console.WriteLine("\n[+] Paciente registrado con éxito.");
 
             Console.WriteLine("\nPresione cualquier tecla para volver...");
             Console.ReadKey();
@@ -77,7 +127,7 @@ namespace SistemaGestionMedica
             Console.WriteLine("========================================");
 
             Console.Write("Ingrese Código de Médico (Ej: MED-04): ");
-            string codigo = Console.ReadLine();
+            string codigo = Console.ReadLine().Trim();
 
             if (medicosLista.Any(m => m.CodigoMedico == codigo))
             {
@@ -87,13 +137,47 @@ namespace SistemaGestionMedica
                 return;
             }
 
-            Console.Write("Ingrese Nombre del Médico: ");
-            string nombre = Console.ReadLine();
+            // VALIDACIÓN DE NOMBRE DE MÉDICO
+            string nombre = "";
+            while (true)
+            {
+                Console.Write("Ingrese Nombre del Médico: ");
+                nombre = Console.ReadLine().Trim();
 
-            Console.Write("Ingrese Especialidad: ");
-            string especialidad = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(nombre))
+                {
+                    Console.WriteLine("[!] Error: El nombre no puede estar vacío.");
+                    continue;
+                }
+                if (nombre.Any(char.IsDigit))
+                {
+                    Console.WriteLine("[!] Error: El nombre del médico no puede contener números.");
+                    continue;
+                }
+                break;
+            }
 
-            Medico nuevoMedico = new Medico(codigo, nombre, especialidad);
+            // VALIDACIÓN DE ESPECIALIDAD
+            string BlackboxEspecialidad = "";
+            while (true)
+            {
+                Console.Write("Ingrese Especialidad: ");
+                BlackboxEspecialidad = Console.ReadLine().Trim();
+
+                if (string.IsNullOrWhiteSpace(BlackboxEspecialidad))
+                {
+                    Console.WriteLine("[!] Error: La especialidad no puede estar vacía.");
+                    continue;
+                }
+                if (BlackboxEspecialidad.Any(char.IsDigit))
+                {
+                    Console.WriteLine("[!] Error: La especialidad no puede contener números.");
+                    continue;
+                }
+                break;
+            }
+
+            Medico nuevoMedico = new Medico(codigo, nombre, BlackboxEspecialidad);
 
             Console.Write("¿Está disponible inicialmente? (si/no): ");
             string disponibleInput = Console.ReadLine().ToLower();
@@ -116,7 +200,7 @@ namespace SistemaGestionMedica
             {
                 foreach (var paciente in pacientesLista)
                 {
-                    paciente.MostrarInformacion();
+                    paciente.MostrarInformation();
                 }
             }
             Console.WriteLine("\nPresione cualquier tecla para volver...");
@@ -238,7 +322,7 @@ namespace SistemaGestionMedica
         {
             Console.Clear();
             Console.WriteLine("========================================");
-            Console.WriteLine("             ATENDER CITA               ");
+            Console.WriteLine("              ATENDER CITA              ");
             Console.WriteLine("========================================");
 
             Console.Write("Ingrese Código de la Cita a atender: ");
