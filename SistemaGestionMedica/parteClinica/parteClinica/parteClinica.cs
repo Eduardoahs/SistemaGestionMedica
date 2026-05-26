@@ -1,183 +1,305 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SistemaGestionMedica;
 
-namespace parteClinica
+namespace SistemaGestionMedica
 {
-    internal class Clinica
+    public class parteClinica
     {
-        private List<Paciente> pacientesLista;
-        private List<Medico> medicosLista;
-        private List<Cita> citasLista;
+        // Listas globales compartidas
+        public static List<Paciente> pacientesLista = new List<Paciente>();
+        public static List<Medico> medicosLista = new List<Medico>();
+        public static List<Cita> citasLista = new List<Cita>();
 
-        public Clinica()
+        public static void CargarDatosIniciales()
         {
-            pacientesLista = new List<Paciente>();
-            medicosLista = new List<Medico>();
-            citasLista = new List<Cita>();
+            // 1. PACIENTES
+            pacientesLista.Add(new Paciente("V-12345678", "Carlos Pérez", 20, "0412-1234567"));
+            pacientesLista.Add(new Paciente("V-87654321", "María Rodríguez", 35, "0414-7654321"));
+            pacientesLista.Add(new Paciente("V-11223344", "Juan Gómez", 50, "0426-1112233"));
 
-            //--- Pacientes de prueba ---
-            pacientesLista.Add(new Paciente("Shadow Ramirez", "26", "04240000000", "V-11.222.333"));
-            pacientesLista.Add(new Paciente("Chris Chan", "43", "04240000000", "V-12.555.444"));
-            pacientesLista.Add(new Paciente("Papo Salsero", "30", "04240000000", "V-13.777.888"));
+            // 2. MÉDICOS
+            medicosLista.Add(new Medico("MED-01", "Dr. Alejandro Flores", "Cardiología"));
+            medicosLista.Add(new Medico("MED-02", "Dra. Elena Rostova", "Pediatría"));
+            medicosLista.Add(new Medico("MED-03", "Dr. Luis Castillo", "Medicina General"));
 
-            //--- Médicos de prueba ---
-            medicosLista.Add(new Medico("INTER-2026-15", "Chisturria Penurias", "Endocrinologia", "No disponible"));
-            medicosLista.Add(new Medico("CIRJ-2026-16", "Horriannys Rodriguez", "Cirujia", "Disponible"));
-            medicosLista.Add(new Medico("INTER-2026-17", "Valen Mistria", "Medicina Interna", "Disponible"));
+            medicosLista[2].Disponible = false;
         }
 
-        public void RegistrarPaciente(string nombreCompleto, string edad, string telefono, string cedula)
+        public static void RegistrarPaciente()
         {
-            if (string.IsNullOrWhiteSpace(nombreCompleto) || string.IsNullOrWhiteSpace(edad) || string.IsNullOrWhiteSpace(telefono) || string.IsNullOrWhiteSpace(cedula))
+            Console.Clear();
+            Console.WriteLine("========================================");
+            Console.WriteLine("          REGISTRAR PACIENTE            ");
+            Console.WriteLine("========================================");
+
+            Console.Write("Ingrese Cédula del Paciente (Ej: V-12345678): ");
+            string cedula = Console.ReadLine();
+
+            if (pacientesLista.Any(p => p.Cedula == cedula))
             {
-                Console.WriteLine("Los datos no pueden estar vacios, por favor intentelo nuevamente.");
+                Console.WriteLine("\n[!] Error: Ya existe un paciente registrado con esa cédula.");
+                Console.WriteLine("\nPresione cualquier tecla para volver...");
+                Console.ReadKey();
                 return;
             }
 
-            if (pacientesLista.Any(p => p.cedulaExistente == cedula))
+            Console.Write("Ingrese Nombre Completo: ");
+            string nombreCompleto = Console.ReadLine();
+
+            Console.Write("Ingrese Edad: ");
+            string edadStr = Console.ReadLine();
+
+            Console.Write("Ingrese Teléfono: ");
+            string telefono = Console.ReadLine();
+
+            try
             {
-                Console.WriteLine("El paciente ya se encuentra registrado.");
-                return;
+                int edadAnios = int.Parse(edadStr);
+                pacientesLista.Add(new Paciente(cedula, nombreCompleto, edadAnios, telefono));
+                Console.WriteLine("\n[+] Paciente registrado con éxito.");
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("\n[!] Error: La edad debe ser un número entero válido.");
             }
 
-            pacientesLista.Add(new Paciente(nombreCompleto, edad, telefono, cedula));
-            Console.WriteLine("Paciente registrado con exito.");
+            Console.WriteLine("\nPresione cualquier tecla para volver...");
+            Console.ReadKey();
         }
 
-        public void RegistrarMedico(string codigoMedico, string nombreCompleto, string especialidad, string disponibilidad)
+        public static void RegistrarMedico()
         {
-            if (string.IsNullOrWhiteSpace(codigoMedico) || string.IsNullOrWhiteSpace(nombreCompleto) || string.IsNullOrWhiteSpace(especialidad) || string.IsNullOrWhiteSpace(disponibilidad))
+            Console.Clear();
+            Console.WriteLine("========================================");
+            Console.WriteLine("           REGISTRAR MÉDICO             ");
+            Console.WriteLine("========================================");
+
+            Console.Write("Ingrese Código de Médico (Ej: MED-04): ");
+            string codigo = Console.ReadLine();
+
+            if (medicosLista.Any(m => m.CodigoMedico == codigo))
             {
-                Console.WriteLine("Todos los campos son obligatorios.");
+                Console.WriteLine("\n[!] Error: Ya existe un médico con ese código.");
+                Console.WriteLine("\nPresione cualquier tecla para volver...");
+                Console.ReadKey();
                 return;
             }
 
-            if (medicosLista.Any(m => m.codigoMedico == codigoMedico))
-            {
-                Console.WriteLine("El médico ya se encuentra registrado.");
-                return;
-            }
+            Console.Write("Ingrese Nombre del Médico: ");
+            string nombre = Console.ReadLine();
 
-            medicosLista.Add(new Medico(codigoMedico, nombreCompleto, especialidad, disponibilidad));
-            Console.WriteLine("Medico registrado con exito.");
+            Console.Write("Ingrese Especialidad: ");
+            string especialidad = Console.ReadLine();
+
+            Medico nuevoMedico = new Medico(codigo, nombre, especialidad);
+
+            Console.Write("¿Está disponible inicialmente? (si/no): ");
+            string disponibleInput = Console.ReadLine().ToLower();
+            nuevoMedico.Disponible = (disponibleInput == "si");
+
+            medicosLista.Add(nuevoMedico);
+            Console.WriteLine("\n[+] Médico registrado con éxito.");
+            Console.WriteLine("\nPresione cualquier tecla para volver...");
+            Console.ReadKey();
         }
 
-        public void AsignarCita(string cedulaAsignar, string codigoMedico, string motivoConsulta)
+        public static void MostrarPacientes()
         {
-            Paciente pacienteExistente = pacientesLista.FirstOrDefault(p => p.cedulaExistente == cedulaAsignar);
-            Medico medicoExistente = medicosLista.FirstOrDefault(m => m.codigoMedico == codigoMedico);
-
-            if (pacienteExistente == null)
-            {
-                Console.WriteLine("Los datos no corresponden a ningun paciente.");
-                return;
-            }
-
-            if (medicoExistente == null)
-            {
-                Console.WriteLine("Los datos no corresponden a ningun medico.");
-                return;
-            }
-
-            string codigoDeCitaUnico = "CITA-" + (citasLista.Count + 1);
-
-            // Solución definitiva: Pasamos los datos tal cual los pide el constructor de tu grupo
-            citasLista.Add(new Cita(codigoDeCitaUnico, pacienteExistente, medicoExistente, DateTime.Now, motivoConsulta, "pendiente"));
-            Console.WriteLine("Cita asignada con exito.");
-        }
-
-        public void AtenderCita(string cedulaPendiente, string codigoMedico)
-        {
-            Cita citaExistente = citasLista.FirstOrDefault(c => c.pacienteAsignado.cedulaExistente == cedulaPendiente && c.medicoAsignado.codigoMedico == codigoMedico);
-
-            if (citaExistente == null)
-            {
-                Console.WriteLine("Los datos no corresponden a ninguna cita.");
-                return;
-            }
-
-            citaExistente.atendida_Si_o_No = true ;
-            citaExistente.medicoAsignado.disponible_Si_o_No = true;
-            Console.WriteLine("Cita atendida con exito.");
-        }
-
-        public void MostrarPacientes()
-        {
-            Console.WriteLine("---Lista de Pacientes---");
+            Console.Clear();
             if (pacientesLista.Count == 0)
             {
-                Console.WriteLine("No hay pacientes registrados.");
-                return;
+                Console.WriteLine("No hay pacientes registrados en el sistema.");
             }
-            foreach (var p in pacientesLista)
+            else
             {
-                Console.WriteLine(p.ToString());
-            }
-        }
-
-        public void MostrarTodosLosMedicos()
-        {
-            Console.WriteLine("---Lista de Medicos---");
-            if (medicosLista.Count == 0)
-            {
-                Console.WriteLine("No hay medicos registrados.");
-                return;
-            }
-            foreach (var m in medicosLista)
-            {
-                Console.WriteLine(m.ToString());
-            }
-        }
-
-        public void MostrarMedicosDisponibles()
-        {
-            Console.WriteLine("---Medicos Disponibles---");
-            var disponibles = medicosLista.Where(m => m.disponible_Si_o_No).ToList();
-            if (disponibles.Count == 0)
-            {
-                Console.WriteLine("No hay medicos disponibles por el momento.");
-                return;
-            }
-            foreach (var m in disponibles)
-            {
-                Console.WriteLine(m.ToString());
-            }
-        }
-
-        public void MostrarCitasPendientes()
-        {
-            Console.WriteLine("---Listado de Citas Pendientes---");
-            bool hayPendientes = false;
-
-            foreach (var cita in citasLista)
-            {
-                // Solución línea 157: Evaluamos de forma segura comparando el texto
-                if (cita.atendida_Si_o_No.ToString().ToLower().Contains("pendiente"))
+                foreach (var paciente in pacientesLista)
                 {
-                    hayPendientes = true;
-                    Console.WriteLine(cita.ToString());
+                    paciente.MostrarInformacion();
                 }
             }
-
-            if (!hayPendientes)
-            {
-                Console.WriteLine("No hay citas pendientes.");
-            }
+            Console.WriteLine("\nPresione cualquier tecla para volver...");
+            Console.ReadKey();
         }
 
-        public void MostrarHistorialCitas()
+        public static void MostrarMedicos()
         {
-            Console.WriteLine("---Historial de Citas---");
-            if (citasLista.Count == 0)
+            Console.Clear();
+            if (medicosLista.Count == 0)
             {
-                Console.WriteLine("No hay citas en el historial.");
+                Console.WriteLine("No hay médicos registrados en el sistema.");
+            }
+            else
+            {
+                Console.WriteLine("==========================================================================");
+                Console.WriteLine("ID\t\tNombre\t\t\tEspecialidad\t\tDisponible");
+                Console.WriteLine("==========================================================================");
+                foreach (var medico in medicosLista)
+                {
+                    string estado = medico.Disponible ? "Sí" : "No";
+                    Console.WriteLine($"{medico.CodigoMedico}\t\t{medico.NombreCompleto}\t\t{medico.Especialidad}\t\t{estado}");
+                }
+            }
+            Console.WriteLine("\nPresione cualquier tecla para volver...");
+            Console.ReadKey();
+        }
+
+        public static void MostrarMedicosDisponibles()
+        {
+            Console.Clear();
+            var disponibles = medicosLista.Where(m => m.Disponible).ToList();
+
+            if (disponibles.Count == 0)
+            {
+                Console.WriteLine("No hay médicos disponibles en este momento.");
+            }
+            else
+            {
+                Console.WriteLine("==========================================================================");
+                Console.WriteLine("ID\t\tNombre\t\t\tEspecialidad");
+                Console.WriteLine("==========================================================================");
+                foreach (var medico in disponibles)
+                {
+                    Console.WriteLine($"{medico.CodigoMedico}\t\t{medico.NombreCompleto}\t\t{medico.Especialidad}");
+                }
+            }
+            Console.WriteLine("\nPresione cualquier tecla para volver...");
+            Console.ReadKey();
+        }
+
+        public static void AgendarCita()
+        {
+            Console.Clear();
+            Console.WriteLine("========================================");
+            Console.WriteLine("          AGENDAR / ASIGNAR CITA        ");
+            Console.WriteLine("========================================");
+
+            Console.Write("Ingrese Cédula del Paciente: ");
+            string cedulaCita = Console.ReadLine();
+
+            var pacienteExistente = pacientesLista.FirstOrDefault(p => p.Cedula == cedulaCita);
+            if (pacienteExistente == null)
+            {
+                Console.WriteLine("\n[!] Error: El paciente no está registrado.");
+                Console.WriteLine("\nPresione cualquier tecla para volver...");
+                Console.ReadKey();
                 return;
             }
-            foreach (var cita in citasLista)
+
+            Console.Write("Ingrese Código del Médico requerido: ");
+            string codigoMedicoCita = Console.ReadLine();
+
+            var medicoExistente = medicosLista.FirstOrDefault(m => m.CodigoMedico == codigoMedicoCita);
+            if (medicoExistente == null)
             {
-                Console.WriteLine(cita.ToString());
+                Console.WriteLine("\n[!] Error: El médico especificado no existe.");
+                Console.WriteLine("\nPresione cualquier tecla para volver...");
+                Console.ReadKey();
+                return;
             }
+
+            if (!medicoExistente.Disponible)
+            {
+                Console.WriteLine($"\n[!] Error: El {medicoExistente.NombreCompleto} no está disponible actualmente.");
+                Console.WriteLine("\nPresione cualquier tecla para volver...");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.Write("Ingrese la fecha y hora (Ej: 26/05/2026 09:00 AM): ");
+            string fechaInput = Console.ReadLine();
+
+            Console.Write("Ingrese motivo de la consulta: ");
+            string motivo = Console.ReadLine();
+
+            try
+            {
+                DateTime fechaCita = DateTime.Parse(fechaInput);
+
+                Cita nuevaCita = new Cita(pacienteExistente, medicoExistente, fechaCita, motivo);
+                citasLista.Add(nuevaCita);
+
+                pacienteExistente.HistorialCitas.Add(nuevaCita);
+                medicoExistente.PacientesAtendidos.Add(pacienteExistente);
+
+                Console.WriteLine($"\n[+] Cita agendada con éxito. Código autogenerado: {nuevaCita.Codigo}");
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("\n[!] Error: El formato de fecha/hora no es válido.");
+            }
+
+            Console.WriteLine("\nPresione cualquier tecla para volver...");
+            Console.ReadKey();
+        }
+
+        public static void AtenderCita()
+        {
+            Console.Clear();
+            Console.WriteLine("========================================");
+            Console.WriteLine("             ATENDER CITA               ");
+            Console.WriteLine("========================================");
+
+            Console.Write("Ingrese Código de la Cita a atender: ");
+            string idCita = Console.ReadLine().ToUpper();
+
+            var cita = citasLista.FirstOrDefault(c => c.Codigo == idCita);
+
+            if (cita == null)
+            {
+                Console.WriteLine("\n[!] Error: La cita no existe.");
+            }
+            else if (cita.Atendida)
+            {
+                Console.WriteLine("\n[!] Esta cita ya fue atendida previamente.");
+            }
+            else
+            {
+                cita.Atendida = true;
+                Console.WriteLine("\n[+] Cita procesada correctamente. Estado cambiado a 'Atendida'.");
+            }
+
+            Console.WriteLine("\nPresione cualquier tecla para volver...");
+            Console.ReadKey();
+        }
+
+        public static void MostrarCitasPendientes()
+        {
+            Console.Clear();
+            var pendientes = citasLista.Where(c => !c.Atendida).ToList();
+
+            if (pendientes.Count == 0)
+            {
+                Console.WriteLine("No hay citas pendientes por atender.");
+            }
+            else
+            {
+                foreach (var cita in pendientes)
+                {
+                    cita.MostrarInformacion();
+                }
+            }
+            Console.WriteLine("\nPresione cualquier tecla para volver...");
+            Console.ReadKey();
+        }
+
+        public static void MostrarHistorialCompleto()
+        {
+            Console.Clear();
+            if (citasLista.Count == 0)
+            {
+                Console.WriteLine("No hay registros de citas en el sistema.");
+            }
+            else
+            {
+                foreach (var cita in citasLista)
+                {
+                    cita.MostrarInformacion();
+                }
+            }
+            Console.WriteLine("\nPresione cualquier tecla para volver...");
+            Console.ReadKey();
         }
     }
 }

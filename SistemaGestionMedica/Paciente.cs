@@ -1,4 +1,3 @@
-using parteClinica;
 using System;
 using System.Collections.Generic;
 
